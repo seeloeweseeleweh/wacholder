@@ -52,6 +52,18 @@ source "$wConfigFile"
 wPathWorkingDirectory='/home/nanooq/.wacholder/dailies/'
 
 ###
+#
+# Functions
+#
+
+encoding() { # $1 string to check for encoding
+   if [[ "$1" == *=?* ]]
+   then
+      echo "$1" >> "$wFileEnc"
+   fi
+}
+
+###
 # 
 # Variables
 #
@@ -64,9 +76,11 @@ wDateString=$(echo "$wPipedEmail" | sed '/^Date: */!d; s///; q' | sed 's/.*< *//
 wDate=$(date -d "$wTupelDate" +%Y%m%d)
 # Mailinglist: Extract mailinglist
 wMailinglist=$(echo "$wPipedEmail" | sed '/^List-Id: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;')
-# TODO take care of encoding
+encoding "$wMailinglist" # TODO take care of encoding
 # Subject: Extract subject
+echo $(echo "$wPipedEmail" | sed '/^Subject: */!d; s///; q')
 wSubject=$(echo "$wPipedEmail" | sed '/^Subject: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;')
+encoding "$wSubject" # TODO take care of encoding
 # TODO take care of Tags, "Re:" and "Forwards"
 # TODO remove not meant separators from text before adding them
 # TODO cut filename at some point. 255 seems to be maximum, but 100 should be enough.
