@@ -35,8 +35,11 @@
 #
 ###############################################################################
 
-wConfigFile='wacholder.cfg'
+# cd to script's directory
+wPathWorkingDirectory=$( cd "$( dirname "$0" )" && pwd )
+cd "$wPathWorkingDirectory"
 
+wConfigFile='wacholder.cfg'
 
 ###
 # 
@@ -47,9 +50,6 @@ wConfigFile='wacholder.cfg'
 # files
 
 source "$wConfigFile"
-
-# TODO
-wPathWorkingDirectory='/home/nanooq/.wacholder/dailies/'
 
 ###
 #
@@ -69,8 +69,7 @@ encoding() { # $1 string to check for encoding
 #
 
 wPipedEmail="$(cat)" # Store piped e-mail text
-
-# Generate a representative filename
+# Generate a re   presentative filename
 # Date: Extract e-mail's date for 
 wDateString=$(echo "$wPipedEmail" | sed '/^Date: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;') 
 wDate=$(date -d "$wTupelDate" +%Y%m%d)
@@ -78,7 +77,6 @@ wDate=$(date -d "$wTupelDate" +%Y%m%d)
 wMailinglist=$(echo "$wPipedEmail" | sed '/^List-Id: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;')
 encoding "$wMailinglist" # TODO take care of encoding
 # Subject: Extract subject
-echo $(echo "$wPipedEmail" | sed '/^Subject: */!d; s///; q')
 wSubject=$(echo "$wPipedEmail" | sed '/^Subject: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;')
 encoding "$wSubject" # TODO take care of encoding
 # TODO take care of Tags, "Re:" and "Forwards"
