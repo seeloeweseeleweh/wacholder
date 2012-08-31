@@ -25,45 +25,62 @@
 # Yes, the methaphor only goes so far. There are TODOs included in the script
 # just search for them.
 #
+# Developers:
+#
+# How the csv-format is implemented:
+# fields' delimiter: ,
+# texts' delimert: "
+#
+# Happy Hacking
+#
 ###############################################################################
 
+wConfigFile='wacholder.cfg'
+
+
+###
+# 
+# Config variables
+#
+
+# TODO: http://wiki.bash-hackers.org/howto/conffile security issues with config 
+# files
+
+source "$wConfigFile"
+
+# TODO
 wPathWorkingDirectory='/home/nanooq/.wacholder/dailies/'
 
-wIncoming="$(cat)"
+###
+# 
+# Variables
+#
 
-sep1='{sep1}'
-sep2='{sep2}'
-sep3='{sep3}'
+wPipedEmail="$(cat)" # Store piped e-mail text
 
-# We ll make file names out of those:
-wDate="$(date +%Y%m%d)"
-wMailingliste=$(echo "$wIncoming" | sed '/^List-Id: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;')
-wSubject=$(echo "$wIncoming" | sed '/^Subject: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;')
-wMailingliste="${wMailingliste/$sep1/}" # remove probable separators 
-wMailingliste="${wMailingliste/$sep2/}"
-wSubject="${wSubject/$sep1/}" # remove probable separators 
-wSubject="${wSubject/$sep2/}"
-wSubject="${wSubject/'Re: '/}" # remove stupid prefixes	
-wtFilename="$wPathWorkingDirectory""$wDate""$sep1""$wMailingliste""$sep2""$wSubject" # TODO That's going to be a long one...
+# Generate a representative filename
+# Date: Extract e-mail's date for 
+wDateString=$(echo "$wPipedEmail" | sed '/^Date: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;') 
+wDate=$(date -d "$wTupelDate" +%Y%m%d)
+# Mailinglist: Extract mailinglist
+wMailinglist=$(echo "$wPipedEmail" | sed '/^List-Id: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;')
+# TODO take care of encoding
+# Subject: Extract subject
+wSubject=$(echo "$wPipedEmail" | sed '/^Subject: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;')
+# TODO take care of Tags, "Re:" and "Forwards"
+# TODO remove not meant separators from text before adding them
+# TODO cut filename at some point. 255 seems to be maximum, but 100 should be enough.
+wtFilename="$wDate""$sep1""$wMailinglist""$sep2""$wSubject""$wCSV"
 
-#echo $wtFilename
-
-# If this is a new "Wacholder" make a file
-if [ ! -e "$wtFilename" ] 
-then 
-   touch "$wtFilename" 
+# Make e-mail meta data 'tupel' permanent in .csv-format
+if [ ! -e "$wDirData"'/'"$wtFilename" ] # If the file does not yet exist...
+then # ...hence this is a new thread and...
+   touch "$wDirData"'/'"$wtFilename" # ...new threads are saved in a file.
 fi
-
-#if [[ "$wSubject" == *=?* ]] # Encoding TODO
-#then 
-#   echo 'message is encoded!'
-#fi
-
-# Here, we want to add a date-bee-tupel to the juniper
-wTupelDate=$(echo "$wIncoming" | sed '/^Date: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;')
-#TODO Should the date be saved in a special format?
-wTupelBee=$(echo "$wIncoming" | sed '/^From: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;')
-wTupelDate="${wTupelDate/$sep3/}" # remove probable separators 
-wTupelBee="${wTupelBee/$sep3/}" # remove probable separators 
-wTupel="$wTupelDate""$sep3""$wTupelBee"
-echo "$wTupel" >> "$wtFilename"
+# Create 'tupel' to be fed into file in .csv-format
+wTupelDate="$wDateString"
+wTupelUser=$(echo "$wPipedEmail" | sed '/^From: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;')
+# TODO remove not meant separators from text before adding them
+wTupel='"'"$wTupelDate"'"'","'"'"$wTupelUser"'"'
+# Push tupel into file
+echo "$wTupel" >> "$wDirData"'/'"$wtFilename"
