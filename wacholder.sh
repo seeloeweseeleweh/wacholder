@@ -31,40 +31,33 @@
 # fields' delimiter: ,
 # texts' delimert: "
 #
+# TODO don't surpass 80 digits line length
+# TODO getops
+# TODO usage
+#
 # Happy Hacking
 #
 ###############################################################################
 
 ###
 #
-# variables needed
+# Variables
 #
 
-wConfigFile="$1"
-
-encoded=''
-unified=''
-
-# cd to script's directory
-wPathWorkingDirectory=$( cd "$( dirname "$0" )" && pwd )
-cd "$wPathWorkingDirectory"
-
-
-###
-# 
-# Config variables
-#
-
-# TODO: http://wiki.bash-hackers.org/howto/conffile security issues with config 
-# files
-
-source "$wConfigFile"
+wConfigFile="$1" 	# will hold absolute path to config file
+decoded='' 		# will hold decoded string, see decoding()
+unified=''		# will hold unified string, see unifying()
+source "$wConfigFile"   # TODO: http://wiki.bash-hackers.org/howto/conffile 
+			# security issues with config files
 
 ###
 #
 # Functions
 #
 
+# TODO take care of Tags, "Re:" and "Forwards"
+# TODO remove not meant separators from text before adding them
+# TODO cut filename at some point. 255 seems to be maximum, but 100 should be enough.
 # Returns unified
 unifying() { # $1 string to unify
    unified="$1"
@@ -73,29 +66,28 @@ unifying() { # $1 string to unify
    then
       decoding "$unified"
    fi
-# TODO take care of Tags, "Re:" and "Forwards"
-# TODO remove not meant separators from text before adding them
-# TODO cut filename at some point. 255 seems to be maximum, but 100 should be enough.
+   unified="$decoded"
+   echo "$decoded" >> decodedStuff.txt
 }
 
 # https://www.ietf.org/rfc/rfc2047.txt
-# Returns encoded
-decoding() { # $1 string to check for encoded
-   if [[ "$encoded" == *=?utf-8?b?* ]] # UTF-8 base 64 unifyTitle
+# Returns decoded
+decoding() { # $1 string to check for decoded
+   if [[ "$decoded" == *=?utf-8?b?* ]] # UTF-8 base 64 unifyTitle
    then 
       continue;
-   elif [[ "$encoded" == *=?utf-8?q?* ]] # UTF-8 Q-unifyTitle
+   elif [[ "$decoded" == *=?utf-8?q?* ]] # UTF-8 Q-unifyTitle
    then 
-      encoded=$(echo "$encoded" | sed 's/=?utf-8?q?//' )	# coding
-      encoded=$(echo "$encoded" | sed 's/=C3=BC/ü/g' )		#ü
-      encoded=$(echo "$encoded" | sed 's/_/ /g' )		#_
-      encoded=$(echo "$encoded" | sed 's/=C3=96/Ö/g' )		#Ö
-      encoded=$(echo "$encoded" | sed 's/=C3=A4/ä/g' )		#ä
-      encoded=$(echo "$encoded" | sed 's/=22/"/g' )		#"
-      encoded=$(echo "$encoded" | sed 's/=C3=B6/ö/g' )		#"
-      encoded=$(echo "$encoded" | sed 's/=C3=9F/ß/g' )		#ß
-      encoded=$(echo "$encoded" | sed 's/=2E/./g' )		#.
-      encoded=$(echo "$encoded" | sed 's/?=//' )		#?=
+      decoded=$(echo "$decoded" | sed 's/=?utf-8?q?//' )	# coding
+      decoded=$(echo "$decoded" | sed 's/=C3=BC/ü/g' )		#ü
+      decoded=$(echo "$decoded" | sed 's/_/ /g' )		#_
+      decoded=$(echo "$decoded" | sed 's/=C3=96/Ö/g' )		#Ö
+      decoded=$(echo "$decoded" | sed 's/=C3=A4/ä/g' )		#ä
+      decoded=$(echo "$decoded" | sed 's/=22/"/g' )		#"
+      decoded=$(echo "$decoded" | sed 's/=C3=B6/ö/g' )		#"
+      decoded=$(echo "$decoded" | sed 's/=C3=9F/ß/g' )		#ß
+      decoded=$(echo "$decoded" | sed 's/=2E/./g' )		#.
+      decoded=$(echo "$decoded" | sed 's/?=//' )		#?=
    fi
 }
 
@@ -104,19 +96,18 @@ usage() {
 }
 
 ###
-# 
-# Variables
-#
-
-wPipedEmail="$(cat)" # Store piped e-mail text
-
-###
 #
 # Skript
 #
 
+wPathWorkingDirectory=$( cd "$( dirname "$0" )" && pwd ) # cd to script's 
+							 # directory
+cd "$wPathWorkingDirectory"	# change into pwd
+wPipedEmail="$(cat)" 		# Store piped e-mail text
+
+#
 # Prepare creation of a representative filename
-# Date: Extract e-mail's date for 
+# Date: Extract e-mail's date 
 wDateString=$(echo "$wPipedEmail" | sed '/^Date: */!d; s///; q' | sed 's/.*< *//;s/ *>.*//;') 
 wDate=$(date -d "$wTupelDate" +%Y%m%d)
 # Mailinglist: Extract mailinglist
@@ -130,6 +121,7 @@ wSubject="$unified"
 # Create a representative filename
 wtFilename="$wDate""$sep1""$wMailinglist""$sep2""$wSubject""$wCSV"
 
+#
 # Save e-mail meta data 'tupel' permanent in a .csv-formated file
 # Prepare permanent .csv-formated file 
 if [ ! -e "$wDirData"'/'"$wtFilename" ] # If the file does not yet exist...
