@@ -39,7 +39,7 @@
 wPathWorkingDirectory=$( cd "$( dirname "$0" )" && pwd )
 cd "$wPathWorkingDirectory"
 
-wConfigFile='wacholder.cfg'
+wConfigFile='/home/nanooq/.wacholder/execution/wacholder.cfg'
 
 ###
 # 
