@@ -61,14 +61,12 @@ source "$wConfigFile"   # TODO: http://wiki.bash-hackers.org/howto/conffile
 # Returns unified
 unifying() { # $1 string to unify
    unified="$1"
-   echo "$unified" >> decodedStuff.txt
    unified=$(echo "$unified" | sed 's/Re: //' )	# Re:
    if [[ unified == *=?* ]]
    then
       decoding "$unified"
       unified="$decoded"
    fi
-   echo "$decoded" >> decodedStuff.txt
 }
 
 # https://www.ietf.org/rfc/rfc2047.txt
@@ -89,6 +87,7 @@ decoding() { # $1 string to check for decoded
       decoded=$(echo "$decoded" | sed 's/=C3=9F/ß/g' )		#ß
       decoded=$(echo "$decoded" | sed 's/=2E/./g' )		#.
       decoded=$(echo "$decoded" | sed 's/?=//' )		#?=
+   echo "$decoded" >> decodedStuff.txt
    fi
 }
 
