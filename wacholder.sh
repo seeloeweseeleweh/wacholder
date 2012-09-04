@@ -61,7 +61,7 @@ source "$wConfigFile"   # TODO: http://wiki.bash-hackers.org/howto/conffile
 # Returns unified
 unifying() { # $1 string to unify
    unified="$1"
-   unified=${unified,,}
+   unified=${unified,,} #TODO Hi, idiot! This will break base64-encoding. Have fun.
    unified=$(echo "$unified" | sed 's/Re//' )	# Re
    unified=$(echo "$unified" | sed 's/Fwd//' )	# Fwd
    unified=$(echo "$unified" | sed 's/://' )	# :
