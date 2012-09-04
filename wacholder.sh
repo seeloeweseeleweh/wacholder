@@ -77,19 +77,23 @@ unifying() { # $1 string to unify
 # https://www.ietf.org/rfc/rfc2047.txt
 # Returns decoded
 decoding() { # $1 string to check for decoded
+      echo "up" >> "$wFileLog"
    if [[ "$decoded" == *=?utf-8?b?* ]] # UTF-8 base 64 encoding
    then 
-      continue;
+      continue
+   elif [[ "$decoded" == *=?windows-1252?Q?* ]] # Windos 1252 Q-encoding
+   then 
+      decoded=$(echo "$decoded" | sed 's/=?windows-1252?Q?//' )	# coding
+      decoded=$(echo "$decoded" | sed 's/=E9/e/' )	# coding
    elif [[ "$decoded" == *=?iso-8859-1?q?* ]] # ISO 8859-1 Q-encoding 
    then
       decoded=$(echo "$decoded" | sed 's/=?iso-8859-1?q?//' )	# coding
       decoded=$(echo "$decoded" | sed 's/=FC/ü/g' )		#ü
       decoded=$(echo "$decoded" | sed 's/=E4/ä/g' )		#ä
-
-
-
-   elif [[ "$decoded" == *=?utf-8?q?* ]] # UTF-8 Q-encoding
+#   elif [[ "$decoded" == *=?utf-8?q?* ]] # UTF-8 Q-encoding
+    elif [[ "${decoded#*'=?utf-8?q?'}" != "$decoded" ]] # UTF-8 Q-encoding #newway
    then 
+      echo "nice" >> "$wFileLog"
       decoded=$(echo "$decoded" | sed 's/=?utf-8?q?//' )	# coding
       decoded=$(echo "$decoded" | sed 's/=C3=BC/ü/g' )		#ü
       decoded=$(echo "$decoded" | sed 's/_/ /g' )		#_
