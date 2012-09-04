@@ -84,25 +84,27 @@ decoding() { # $1 string to check for decoded
    elif [[ "$decoded" == *=?windows-1252?Q?* ]] # Windos 1252 Q-encoding
    then 
       decoded=$(echo "$decoded" | sed 's/=?windows-1252?Q?//' )	# coding
-      decoded=$(echo "$decoded" | sed 's/=E9/e/' )	# coding
-   elif [[ "$decoded" == *=?iso-8859-1?q?* ]] # ISO 8859-1 Q-encoding 
+      decoded=$(echo "$decoded" | sed 's/=e9/e/' )	# coding
+=?iso-8859-1?q?protokolle/zwischenst=e4nde?=
+#   elif [[ "$decoded" == *=?iso-8859-1?q?* ]] # ISO 8859-1 Q-encoding 
+   elif [[ "${decoded#*'=?iso-8859-1?q?'}" != "$decoded" ]] # ISO 8859-1 Q-encoding #newway
    then
       decoded=$(echo "$decoded" | sed 's/=?iso-8859-1?q?//' )	# coding
-      decoded=$(echo "$decoded" | sed 's/=FC/ü/g' )		#ü
-      decoded=$(echo "$decoded" | sed 's/=E4/ä/g' )		#ä
+      decoded=$(echo "$decoded" | sed 's/=fc/ü/g' )		#ü
+      decoded=$(echo "$decoded" | sed 's/=e4/ä/g' )		#ä
 #   elif [[ "$decoded" == *=?utf-8?q?* ]] # UTF-8 Q-encoding
     elif [[ "${decoded#*'=?utf-8?q?'}" != "$decoded" ]] # UTF-8 Q-encoding #newway
    then 
       echo "nice" >> "$wFileLog"
       decoded=$(echo "$decoded" | sed 's/=?utf-8?q?//' )	# coding
-      decoded=$(echo "$decoded" | sed 's/=C3=BC/ü/g' )		#ü
+      decoded=$(echo "$decoded" | sed 's/=c3=bc/ü/g' )		#ü
       decoded=$(echo "$decoded" | sed 's/_/ /g' )		#_
-      decoded=$(echo "$decoded" | sed 's/=C3=96/Ö/g' )		#Ö
-      decoded=$(echo "$decoded" | sed 's/=C3=A4/ä/g' )		#ä
+      decoded=$(echo "$decoded" | sed 's/=c3=96/Ö/g' )		#Ö
+      decoded=$(echo "$decoded" | sed 's/=c3=a4/ä/g' )		#ä
       decoded=$(echo "$decoded" | sed 's/=22/"/g' )		#"
-      decoded=$(echo "$decoded" | sed 's/=C3=B6/ö/g' )		#"
-      decoded=$(echo "$decoded" | sed 's/=C3=9F/ß/g' )		#ß
-      decoded=$(echo "$decoded" | sed 's/=2E/./g' )		#.
+      decoded=$(echo "$decoded" | sed 's/=c3=b6/ö/g' )		#"
+      decoded=$(echo "$decoded" | sed 's/=c3=9f/ß/g' )		#ß
+      decoded=$(echo "$decoded" | sed 's/=2e/./g' )		#.
       decoded=$(echo "$decoded" | sed 's/?=//' )		#?=
       echo "$decoded" >> "$wFileLog"
    fi
