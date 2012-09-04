@@ -64,7 +64,7 @@ unifying() { # $1 string to unify
    unified=${unified,,} #TODO Hi, idiot! This will break base64-encoding. Have fun.
    unified=$(echo "$unified" | sed 's/Re//' )	# Re
    unified=$(echo "$unified" | sed 's/Fwd//' )	# Fwd
-   unified=$(echo "$unified" | sed 's/://' )	# :
+   unified=$(echo "$unified" | sed 's/://g' )	# :
    if [[ unified == *=?* ]]
    then
       decoding "$unified"
