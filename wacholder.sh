@@ -63,11 +63,13 @@ unifying() { # $1 string to unify
    unified="$1"
    unified=$(echo "$unified" | sed 's/Re//' )	# Re
    unified=$(echo "$unified" | sed 's/Fwd//' )	# Fwd
-   unified=$(echo "$unified" | sed 's/://' )	# Fwd
+   unified=$(echo "$unified" | sed 's/://' )	# :
    if [[ unified == *=?* ]]
    then
       decoding "$unified"
       unified="$decoded"
+   else 
+      echo 'NoUnifyingNeeded:'"$unified" >> "$wFileLog"
    fi
 }
 
@@ -93,7 +95,7 @@ decoding() { # $1 string to check for decoded
       decoded=$(echo "$decoded" | sed 's/=C3=9F/ß/g' )		#ß
       decoded=$(echo "$decoded" | sed 's/=2E/./g' )		#.
       decoded=$(echo "$decoded" | sed 's/?=//' )		#?=
-   echo "$decoded" >> "$wFileLog"
+      echo "$decoded" >> "$wFileLog"
    fi
 }
 
