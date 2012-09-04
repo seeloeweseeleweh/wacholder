@@ -61,7 +61,9 @@ source "$wConfigFile"   # TODO: http://wiki.bash-hackers.org/howto/conffile
 # Returns unified
 unifying() { # $1 string to unify
    unified="$1"
-   unified=$(echo "$unified" | sed 's/Re: //' )	# Re:
+   unified=$(echo "$unified" | sed 's/Re//' )	# Re
+   unified=$(echo "$unified" | sed 's/Fwd//' )	# Fwd
+   unified=$(echo "$unified" | sed 's/://' )	# Fwd
    if [[ unified == *=?* ]]
    then
       decoding "$unified"
@@ -72,10 +74,14 @@ unifying() { # $1 string to unify
 # https://www.ietf.org/rfc/rfc2047.txt
 # Returns decoded
 decoding() { # $1 string to check for decoded
-   if [[ "$decoded" == *=?utf-8?b?* ]] # UTF-8 base 64 unifyTitle
+   if [[ "$decoded" == *=?utf-8?b?* ]] # UTF-8 base 64 encoding
    then 
       continue;
-   elif [[ "$decoded" == *=?utf-8?q?* ]] # UTF-8 Q-unifyTitle
+   elif [[ "$decoded" == *=?iso-8859-1?q?* ]] # ISO 8859-1 Q-encoding 
+   then
+      decoded=$(echo "$decoded" | sed 's/=?iso-8859-1?q?//' )	# coding
+      decoded=$(echo "$decoded" | sed 's/=FC/ü/g' )		#ü
+   elif [[ "$decoded" == *=?utf-8?q?* ]] # UTF-8 Q-encoding
    then 
       decoded=$(echo "$decoded" | sed 's/=?utf-8?q?//' )	# coding
       decoded=$(echo "$decoded" | sed 's/=C3=BC/ü/g' )		#ü
