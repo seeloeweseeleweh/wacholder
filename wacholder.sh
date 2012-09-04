@@ -77,25 +77,25 @@ unifying() { # $1 string to unify
 # https://www.ietf.org/rfc/rfc2047.txt
 # Returns decoded
 decoding() { # $1 string to check for decoded
-      echo "up" >> "$wFileLog"
    if [[ "$decoded" == *=?utf-8?b?* ]] # UTF-8 base 64 encoding
    then 
       continue
-   elif [[ "$decoded" == *=?windows-1252?Q?* ]] # Windos 1252 Q-encoding
+#   elif [[ "$decoded" == *=?windows-1252?Q?* ]] # Windos 1252 Q-encoding
+   elif [[ "${decoded#*'=?windows-1252?Q?'}" != "$decoded" ]] # Windos 1252 Q-encoding #newway
    then 
       decoded=$(echo "$decoded" | sed 's/=?windows-1252?Q?//' )	# coding
-      decoded=$(echo "$decoded" | sed 's/=e9/e/' )	# coding
-=?iso-8859-1?q?protokolle/zwischenst=e4nde?=
+      decoded=$(echo "$decoded" | sed 's/=e9/e/' )		# coding
+      echo "$decoded" >> "[=?windows-1252?Q?]$wFileLog"
 #   elif [[ "$decoded" == *=?iso-8859-1?q?* ]] # ISO 8859-1 Q-encoding 
    elif [[ "${decoded#*'=?iso-8859-1?q?'}" != "$decoded" ]] # ISO 8859-1 Q-encoding #newway
    then
       decoded=$(echo "$decoded" | sed 's/=?iso-8859-1?q?//' )	# coding
       decoded=$(echo "$decoded" | sed 's/=fc/ü/g' )		#ü
       decoded=$(echo "$decoded" | sed 's/=e4/ä/g' )		#ä
+      echo "$decoded" >> "[=?iso-8859-1?q?]$wFileLog"
 #   elif [[ "$decoded" == *=?utf-8?q?* ]] # UTF-8 Q-encoding
     elif [[ "${decoded#*'=?utf-8?q?'}" != "$decoded" ]] # UTF-8 Q-encoding #newway
    then 
-      echo "nice" >> "$wFileLog"
       decoded=$(echo "$decoded" | sed 's/=?utf-8?q?//' )	# coding
       decoded=$(echo "$decoded" | sed 's/=c3=bc/ü/g' )		#ü
       decoded=$(echo "$decoded" | sed 's/_/ /g' )		#_
@@ -105,9 +105,9 @@ decoding() { # $1 string to check for decoded
       decoded=$(echo "$decoded" | sed 's/=c3=b6/ö/g' )		#"
       decoded=$(echo "$decoded" | sed 's/=c3=9f/ß/g' )		#ß
       decoded=$(echo "$decoded" | sed 's/=2e/./g' )		#.
-      decoded=$(echo "$decoded" | sed 's/?=//' )		#?=
-      echo "$decoded" >> "$wFileLog"
+      echo "$decoded" >> "[=?utf-8?q?]$wFileLog"
    fi
+      decoded=$(echo "$decoded" | sed 's/?=//' )		#?=
 }
 
 usage() {
