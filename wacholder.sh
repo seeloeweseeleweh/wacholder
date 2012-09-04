@@ -61,6 +61,7 @@ source "$wConfigFile"   # TODO: http://wiki.bash-hackers.org/howto/conffile
 # Returns unified
 unifying() { # $1 string to unify
    unified="$1"
+   unified=${unified,,}
    unified=$(echo "$unified" | sed 's/Re//' )	# Re
    unified=$(echo "$unified" | sed 's/Fwd//' )	# Fwd
    unified=$(echo "$unified" | sed 's/://' )	# :
@@ -83,6 +84,10 @@ decoding() { # $1 string to check for decoded
    then
       decoded=$(echo "$decoded" | sed 's/=?iso-8859-1?q?//' )	# coding
       decoded=$(echo "$decoded" | sed 's/=FC/ü/g' )		#ü
+      decoded=$(echo "$decoded" | sed 's/=E4/ä/g' )		#ä
+
+
+
    elif [[ "$decoded" == *=?utf-8?q?* ]] # UTF-8 Q-encoding
    then 
       decoded=$(echo "$decoded" | sed 's/=?utf-8?q?//' )	# coding
