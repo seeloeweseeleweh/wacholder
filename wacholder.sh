@@ -87,7 +87,7 @@ decoding() { # $1 string to check for decoded
       decoded=$(echo "$decoded" | sed 's/=C3=9F/ß/g' )		#ß
       decoded=$(echo "$decoded" | sed 's/=2E/./g' )		#.
       decoded=$(echo "$decoded" | sed 's/?=//' )		#?=
-   echo "$decoded" >> decodedStuff.txt
+   echo "$decoded" >> "$wFileLog"
    fi
 }
 
