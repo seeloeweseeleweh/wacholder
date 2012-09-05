@@ -68,8 +68,10 @@ unifying() { # $1 string to unify
 #   if [[ unified == *=?* ]]
    if [[ "${unified#*'=?'}" != "$unified" ]] # If coding in use #newway
    then
+      echo 'UnifyingNeeded:'"$unified" >> "$wFileLog"
       decoding "$unified" #decode
       unified="$decoded"
+      echo 'UnifyingNeeded:'"$unified" >> "$wFileLog"
    else 
       echo 'NoUnifyingNeeded:'"$unified" >> "$wFileLog"
    fi
@@ -77,23 +79,34 @@ unifying() { # $1 string to unify
 
 # https://www.ietf.org/rfc/rfc2047.txt
 # Returns decoded
+
+# 
+# Benzinmotor 33 - 36%
+# Dieselmotor 36 - 38%
+# Dampfmotor 34 - 40%
+# Gasturbinen 35 - 40%
+# Dampfturbinen 39%
+# Strahlturbinen 40%
+# Raketeturbinen 45-53%
+#
+
+
 decoding() { # $1 string to check for decoded
-   if [[ "$decoded" == *=?utf-8?b?* ]] # UTF-8 base 64 encoding
+   decoded="$1"
+   if [[ "${decoded#*'=?utf-8?b?'}" != "$decoded" ]] # UTF-8 base 64 encoding #newway
    then 
-      continue
-#   elif [[ "$decoded" == *=?windows-1252?Q?* ]] # Windos 1252 Q-encoding
+       echo "$decoded" >> '[?utf-8?b?]'
    elif [[ "${decoded#*'=?windows-1252?Q?'}" != "$decoded" ]] # Windos 1252 Q-encoding #newway
    then 
       decoded=$(echo "$decoded" | sed 's/=?windows-1252?Q?//' )	# coding
       decoded=$(echo "$decoded" | sed 's/=e9/e/' )		# coding
-      echo "$decoded" >> "[=?windows-1252?Q?]$wFileLog"
-#   elif [[ "$decoded" == *=?iso-8859-1?q?* ]] # ISO 8859-1 Q-encoding 
+      echo "$decoded" >> '[=?windows-1252?Q?]'
    elif [[ "${decoded#*'=?iso-8859-1?q?'}" != "$decoded" ]] # ISO 8859-1 Q-encoding #newway
    then
       decoded=$(echo "$decoded" | sed 's/=?iso-8859-1?q?//' )	# coding
       decoded=$(echo "$decoded" | sed 's/=fc/ü/g' )		#ü
       decoded=$(echo "$decoded" | sed 's/=e4/ä/g' )		#ä
-      echo "$decoded" >> "[=?iso-8859-1?q?]$wFileLog"
+      echo "$decoded" >> '[=?iso-8859-1?q?]'
 #   elif [[ "$decoded" == *=?utf-8?q?* ]] # UTF-8 Q-encoding
     elif [[ "${decoded#*'=?utf-8?q?'}" != "$decoded" ]] # UTF-8 Q-encoding #newway
    then 
@@ -106,9 +119,10 @@ decoding() { # $1 string to check for decoded
       decoded=$(echo "$decoded" | sed 's/=c3=b6/ö/g' )		#"
       decoded=$(echo "$decoded" | sed 's/=c3=9f/ß/g' )		#ß
       decoded=$(echo "$decoded" | sed 's/=2e/./g' )		#.
-      echo "$decoded" >> "[=?utf-8?q?]$wFileLog"
+      echo "$decoded" >> '[=?utf-8?q?]'
    fi
       decoded=$(echo "$decoded" | sed 's/?=//' )		#?=
+      echo "$decoded" >> 'Decoded: '"$wFileLog"
 }
 
 usage() {
