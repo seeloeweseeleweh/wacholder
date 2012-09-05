@@ -66,7 +66,7 @@ unifying() { # $1 string to unify
    unified=$(echo "$unified" | sed 's/Fwd//' )	# Fwd
    unified=$(echo "$unified" | sed 's/://g' )	# :
 #   if [[ unified == *=?* ]]
-   elif [[ "${unified#*'=?'}" != "$unified" ]] # If coding in use #newway
+   if [[ "${unified#*'=?'}" != "$unified" ]] # If coding in use #newway
    then
       decoding "$unified" #decode
       unified="$decoded"
