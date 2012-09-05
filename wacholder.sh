@@ -61,13 +61,14 @@ source "$wConfigFile"   # TODO: http://wiki.bash-hackers.org/howto/conffile
 # Returns unified
 unifying() { # $1 string to unify
    unified="$1"
-   unified=${unified,,} #TODO Hi, idiot! This will break base64-encoding. Have fun.
+#   unified=${unified,,} #TODO Hi, idiot! This will break base64-encoding. Have fun.
    unified=$(echo "$unified" | sed 's/Re//' )	# Re
    unified=$(echo "$unified" | sed 's/Fwd//' )	# Fwd
    unified=$(echo "$unified" | sed 's/://g' )	# :
-   if [[ unified == *=?* ]]
+#   if [[ unified == *=?* ]]
+   elif [[ "${unified#*'=?'}" != "$unified" ]] # If coding in use #newway
    then
-      decoding "$unified"
+      decoding "$unified" #decode
       unified="$decoded"
    else 
       echo 'NoUnifyingNeeded:'"$unified" >> "$wFileLog"
@@ -156,3 +157,7 @@ wTupelUser="$unified"
 wTupel='"'"$wTupelDate"'"'","'"'"$wTupelUser"'"'
 # Push tupel into permanent in a .csv-formated file
 echo "$wTupel" >> "$wDirData"'/'"$wtFilename"
+
+#
+# Save e-mail 
+
