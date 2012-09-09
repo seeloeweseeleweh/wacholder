@@ -93,26 +93,30 @@ unifying() { # $1 string to unify
 
 decoding() { # $1 string to check for decoded
    decoded="$1"
+   decoded=$(echo "$decoded" | sed 's/_/ /g' )			#_
    if [[ "${decoded#*'=?utf-8?b?'}" != "$decoded" ]] # UTF-8 base 64 encoding #newway
    then 
        echo "$decoded" >> '[?utf-8?b?]'
    elif [[ "${decoded#*'=?windows-1252?Q?'}" != "$decoded" ]] # Windos 1252 Q-encoding #newway
    then 
+      decoded=${decoded,,}
       decoded=$(echo "$decoded" | sed 's/=?windows-1252?Q?//' )	# coding
       decoded=$(echo "$decoded" | sed 's/=e9/e/' )		# coding
       echo "$decoded" >> '[=?windows-1252?Q?]'
    elif [[ "${decoded#*'=?iso-8859-1?q?'}" != "$decoded" ]] # ISO 8859-1 Q-encoding #newway
    then
+      decoded=${decoded,,}					# lower case
       decoded=$(echo "$decoded" | sed 's/=?iso-8859-1?q?//' )	# coding
       decoded=$(echo "$decoded" | sed 's/=fc/ü/g' )		#ü
       decoded=$(echo "$decoded" | sed 's/=e4/ä/g' )		#ä
+      decoded=$(echo "$decoded" | sed 's/=f6/ö/g' )		#ö
+      decoded=$(echo "$decoded" | sed 's/=d6/Ö/g' )		#Ö
       echo "$decoded" >> '[=?iso-8859-1?q?]'
-#   elif [[ "$decoded" == *=?utf-8?q?* ]] # UTF-8 Q-encoding
     elif [[ "${decoded#*'=?utf-8?q?'}" != "$decoded" ]] # UTF-8 Q-encoding #newway
    then 
+      decoded=${decoded,,}					# lower case
       decoded=$(echo "$decoded" | sed 's/=?utf-8?q?//' )	# coding
       decoded=$(echo "$decoded" | sed 's/=c3=bc/ü/g' )		#ü
-      decoded=$(echo "$decoded" | sed 's/_/ /g' )		#_
       decoded=$(echo "$decoded" | sed 's/=c3=96/Ö/g' )		#Ö
       decoded=$(echo "$decoded" | sed 's/=c3=a4/ä/g' )		#ä
       decoded=$(echo "$decoded" | sed 's/=22/"/g' )		#"
@@ -122,7 +126,6 @@ decoding() { # $1 string to check for decoded
       echo "$decoded" >> '[=?utf-8?q?]'
    fi
       decoded=$(echo "$decoded" | sed 's/?=//' )		#?=
-      echo "$decoded" >> 'Decoded: '"$wFileLog"
 }
 
 usage() {
